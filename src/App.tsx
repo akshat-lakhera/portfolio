@@ -1,167 +1,92 @@
-import React, { useState, useEffect } from 'react';
-import { projectsData } from './data/projectsData';
-import { skillsData } from './data/skillsData';
-import type { Project, TelemetryData } from './types';
-import { TopStatusBar } from './components/TopStatusBar';
-import { LeftSidebar } from './components/LeftSidebar';
-import { DataFlow3DCanvas } from './components/DataFlow3DCanvas';
-import { InteractiveSandbox } from './components/InteractiveSandbox';
-import { ModelPlayground } from './components/ModelPlayground';
-import { ProfileBioView } from './components/ProfileBioView';
-import { RightTelemetryPanel } from './components/RightTelemetryPanel';
-import { TerminalPanel } from './components/TerminalPanel';
-import { CommandPalette } from './components/CommandPalette';
-import { DataGovernanceModal } from './components/DataGovernanceModal';
-import { ProjectDetailModal } from './components/ProjectDetailModal';
-import { TerminalLandingGate } from './components/TerminalLandingGate';
+import { Suspense, useState } from 'react';
+import { Canvas } from '@react-three/fiber';
+import { Physics } from '@react-three/cannon';
+import { Environment, Stars, Loader } from '@react-three/drei';
+import { RocketScene } from './components/3d/RocketScene';
+import type { SystemState } from './components/3d/RocketScene';
+import { UIManager } from './components/ui/UIManager';
+import { LaunchIntroUI } from './components/ui/LaunchIntroUI';
 
-export const App: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<'viewport' | 'notebook' | 'playground' | 'profile'>('viewport');
-  const [selectedProject, setSelectedProject] = useState<Project | null>(projectsData[0]);
-  const [showLandingGate, setShowLandingGate] = useState<boolean>(true);
-  const [isMuted, setIsMuted] = useState<boolean>(false);
-  const [terminalOpen, setTerminalOpen] = useState<boolean>(false);
-  const [commandPaletteOpen, setCommandPaletteOpen] = useState<boolean>(false);
-  const [governanceModalOpen, setGovernanceModalOpen] = useState<boolean>(false);
-  const [projectModalOpen, setProjectModalOpen] = useState<boolean>(false);
-  const [isOverclock, setIsOverclock] = useState<boolean>(false);
+export default function App() {
+  const [systemState, setSystemState] = useState<SystemState>('LAUNCH_PAD');
+  const [activeHub, setActiveHub] = useState<string | null>(null);
+  const [activeWarp, setActiveWarp] = useState(false);
 
-  const [telemetry] = useState<TelemetryData>({
-    gpuVramUsedGB: 18.4,
-    gpuVramTotalGB: 24.0,
-    trainingEpoch: 28,
-    totalEpochs: 50,
-    currentLoss: 0.0415,
-    valLoss: 0.0820,
-    accuracy: 98.9,
-    learningRate: 0.0003,
-    gpuTempC: 62,
-  });
-
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
-        e.preventDefault();
-        setCommandPaletteOpen((prev) => !prev);
-      }
-    };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, []);
-
-  const handleSelectProject = (project: Project | null) => {
-    setSelectedProject(project);
-    if (project) {
-      setProjectModalOpen(true);
-    }
+  const handleEnterSpace = () => {
+    setActiveWarp(true);
+    setTimeout(() => {
+      setSystemState('UNIVERSE_MAP');
+      setActiveWarp(false);
+    }, 800);
   };
 
-  const handleTriggerOverclock = () => {
-    setIsOverclock((prev) => !prev);
+  const handleWarpToSystem = (targetSystem: SystemState) => {
+    if (activeWarp) return;
+    setActiveWarp(true);
+    
+    setTimeout(() => {
+      setSystemState(targetSystem);
+      setActiveWarp(false);
+    }, 900);
   };
 
-  const handleTriggerAgent = () => {
-    setActiveTab('notebook');
+  const handleReturnToUniverse = () => {
+    if (activeWarp) return;
+    setActiveWarp(true);
+    setTimeout(() => {
+      setSystemState('UNIVERSE_MAP');
+      setActiveHub(null);
+      setActiveWarp(false);
+    }, 900);
   };
-
-  if (showLandingGate) {
-    return <TerminalLandingGate onEnterDashboard={() => setShowLandingGate(false)} />;
-  }
 
   return (
-    <div className={`w-screen h-screen flex flex-col bg-slate-950 text-slate-100 overflow-hidden font-sans ${
-      isOverclock ? 'hue-rotate-15 contrast-125' : ''
-    }`}>
-      <TopStatusBar
-        activeTab={activeTab}
-        setActiveTab={setActiveTab}
-        gpuLoss={telemetry.currentLoss}
-        gpuVram={telemetry.gpuVramUsedGB}
-        onOpenCommandPalette={() => setCommandPaletteOpen(true)}
-        onOpenGovernanceModal={() => setGovernanceModalOpen(true)}
-        isMuted={isMuted}
-        setIsMuted={setIsMuted}
-        terminalOpen={terminalOpen}
-        setTerminalOpen={setTerminalOpen}
-        isOverclock={isOverclock}
-        setIsOverclock={setIsOverclock}
-      />
+    <div className="w-screen h-screen relative overflow-hidden bg-[#030303]">
+      {systemState === 'LAUNCH_PAD' ? (
+        <LaunchIntroUI onEnterSpace={handleEnterSpace} />
+      ) : (
+        <>
+          <div className="canvas-container">
+            <Canvas shadows camera={{ position: [0, 4, 25], fov: 45 }} gl={{ antialias: true }}>
+              <color attach="background" args={['#010101']} />
+              <ambientLight intensity={0.4} />
+              <directionalLight castShadow position={[100, 50, -50]} intensity={1.5} color="#ffffff" />
+              
+              <Stars radius={200} depth={50} count={6000} factor={4} saturation={0} fade speed={1} />
+              
+              <Suspense fallback={null}>
+                <Physics broadphase="SAP" gravity={[0, 0, 0]}>
+                  <RocketScene 
+                    systemState={systemState}
+                    isLaunching={false}
+                    activeWarp={activeWarp}
+                    onWarpToSystem={handleWarpToSystem}
+                    onHubEnter={setActiveHub} 
+                    onHubLeave={() => setActiveHub(null)} 
+                  />
+                </Physics>
 
-      <div className="flex-1 flex overflow-hidden relative">
-        <LeftSidebar
-          projects={projectsData}
-          skills={skillsData}
-          selectedProject={selectedProject}
-          onSelectProject={handleSelectProject}
-          onOpenGovernanceModal={() => setGovernanceModalOpen(true)}
-        />
+                <Environment preset="night" />
+              </Suspense>
+            </Canvas>
+          </div>
 
-        <main className="flex-1 h-full relative overflow-hidden bg-slate-950">
-          {activeTab === 'viewport' && (
-            <DataFlow3DCanvas
-              projects={projectsData}
-              selectedProject={selectedProject}
-              onSelectProject={handleSelectProject}
-              gpuLoss={telemetry.currentLoss}
+          <div className="ui-container">
+            <UIManager 
+              systemState={systemState}
+              activeHub={activeHub}
+              onReturnToUniverse={handleReturnToUniverse}
             />
-          )}
+          </div>
+        </>
+      )}
 
-          {activeTab === 'notebook' && (
-            <InteractiveSandbox />
-          )}
-
-          {activeTab === 'playground' && (
-            <ModelPlayground projects={projectsData} />
-          )}
-
-          {activeTab === 'profile' && (
-            <ProfileBioView />
-          )}
-        </main>
-
-        <RightTelemetryPanel
-          selectedProject={selectedProject}
-          telemetry={{
-            trainingEpoch: telemetry.trainingEpoch,
-            gpuVRAM: telemetry.gpuVramUsedGB,
-            loss: telemetry.currentLoss,
-            rocAuc: telemetry.accuracy,
-          }}
-          isOverclock={isOverclock}
-          onExpandProject={(p) => {
-            setSelectedProject(p);
-            setProjectModalOpen(true);
-          }}
-        />
-      </div>
-
-      <TerminalPanel
-        isOpen={terminalOpen}
-        onClose={() => setTerminalOpen(false)}
-        onTriggerOverclock={handleTriggerOverclock}
-        onTriggerAgent={handleTriggerAgent}
-      />
-
-      <CommandPalette
-        isOpen={commandPaletteOpen}
-        onClose={() => setCommandPaletteOpen(false)}
-        projects={projectsData}
-        onSelectProject={handleSelectProject}
-        setActiveTab={setActiveTab}
-        onOpenGovernanceModal={() => setGovernanceModalOpen(true)}
-      />
-
-      <DataGovernanceModal
-        isOpen={governanceModalOpen}
-        onClose={() => setGovernanceModalOpen(false)}
-      />
-
-      <ProjectDetailModal
-        project={projectModalOpen ? selectedProject : null}
-        onClose={() => setProjectModalOpen(false)}
+      <Loader 
+        containerStyles={{ background: '#030303' }}
+        innerStyles={{ width: '300px', height: '2px', background: 'rgba(255,255,255,0.1)' }}
+        barStyles={{ background: '#c9962a' }}
+        dataStyles={{ fontFamily: 'JetBrains Mono, monospace', fontSize: '11px', letterSpacing: '0.2em', color: '#c9962a' }}
       />
     </div>
   );
-};
-
-export default App;
+}
