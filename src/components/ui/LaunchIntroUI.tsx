@@ -1,11 +1,5 @@
 import React, { useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { AuroraBackground } from '../react-bits/AuroraBackground';
-import { DecryptedText } from '../react-bits/DecryptedText';
-import { SplitText } from '../react-bits/SplitText';
-import { SpotlightCard } from '../react-bits/SpotlightCard';
-import { MagnetButton } from '../react-bits/MagnetButton';
-import { logger } from '../../lib/contracts';
 
 interface LaunchIntroUIProps {
   onEnterSpace: () => void;
@@ -16,7 +10,6 @@ export const LaunchIntroUI: React.FC<LaunchIntroUIProps> = ({ onEnterSpace }) =>
   const videoRef = useRef<HTMLVideoElement>(null);
 
   const handleLaunchClick = () => {
-    logger.log('info', 'LaunchIntroUI', 'LaunchButtonClicked');
     setIsPlayingVideo(true);
     setTimeout(() => {
       if (videoRef.current) {
@@ -26,19 +19,19 @@ export const LaunchIntroUI: React.FC<LaunchIntroUIProps> = ({ onEnterSpace }) =>
   };
 
   const handleVideoEnded = () => {
-    logger.log('info', 'LaunchIntroUI', 'VideoEndedCompleted');
     onEnterSpace();
   };
 
   return (
-    <AuroraBackground className="w-full h-full relative overflow-hidden flex flex-col justify-between items-center z-50">
+    <div className="w-full h-full relative overflow-hidden bg-black flex flex-col justify-between items-center z-50">
+      
       {/* Video Background (Plays ONLY when Launch Button is clicked) */}
       {isPlayingVideo && (
-        <motion.div
+        <motion.div 
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-          className="absolute inset-0 w-full h-full z-10"
+          transition={{ duration: 0.8 }}
+          className="absolute inset-0 w-full h-full z-0"
         >
           <video
             ref={videoRef}
@@ -48,16 +41,14 @@ export const LaunchIntroUI: React.FC<LaunchIntroUIProps> = ({ onEnterSpace }) =>
             playsInline
             onEnded={handleVideoEnded}
           />
-
+          
           {/* Skip Button during Video Playback */}
-          <MagnetButton
+          <button
             onClick={onEnterSpace}
-            className="absolute top-8 right-8 z-30"
+            className="absolute top-8 right-8 z-30 bg-black/70 backdrop-blur-md border border-white/20 text-white font-sans text-[11px] px-5 py-2.5 rounded-full tracking-widest uppercase hover:bg-[#f5b942] hover:text-black transition-all cursor-pointer pointer-events-auto"
           >
-            <div className="bg-[#070a0f]/80 backdrop-blur-md border border-amber-400/30 text-amber-200 font-mono text-[11px] px-5 py-2.5 rounded-full tracking-widest uppercase hover:bg-amber-400 hover:text-black transition-all shadow-xl">
-              SKIP INTO COSMOS ⏩
-            </div>
-          </MagnetButton>
+            SKIP INTO COSMOS ⏩
+          </button>
         </motion.div>
       )}
 
@@ -65,81 +56,63 @@ export const LaunchIntroUI: React.FC<LaunchIntroUIProps> = ({ onEnterSpace }) =>
         {!isPlayingVideo && (
           <>
             {/* Top Header Credentials */}
-            <motion.div
-              initial={{ opacity: 0, y: -24 }}
+            <motion.div 
+              initial={{ opacity: 0, y: -30 }}
               animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -24 }}
-              transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+              exit={{ opacity: 0, y: -30 }}
+              transition={{ duration: 0.8 }}
               className="relative z-20 text-center mt-12 px-4"
             >
-              <div className="text-[11px] font-mono text-amber-400/90 tracking-[0.35em] uppercase mb-2 flex items-center justify-center gap-2">
-                <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse"></span>
-                <span>IIIT DELHI • B.TECH CS & APPLIED MATHEMATICS</span>
+              <div className="text-[11px] font-mono text-[#f5b942] tracking-[0.4em] uppercase mb-1 drop-shadow-md">
+                IIIT DELHI • B.TECH CS & APPLIED MATHEMATICS
               </div>
-
-              <h1 className="font-heading text-5xl md:text-7xl text-slate-100 tracking-[0.12em] font-extrabold drop-shadow-[0_0_40px_rgba(245,185,66,0.3)]">
-                <DecryptedText text="AKSHAT LAKHERA" speed={30} maxIterations={12} />
+              <h1 className="font-sans text-4xl md:text-6xl text-white tracking-[0.2em] font-semibold drop-shadow-[0_0_30px_rgba(245,185,66,0.4)]">
+                AKSHAT LAKHERA
               </h1>
-
-              <div className="font-sans text-xs md:text-sm text-slate-300/80 tracking-[0.2em] uppercase mt-3 max-w-2xl mx-auto leading-relaxed">
-                <SplitText
-                  text="Engineering Intelligent Systems • Systems Engineer • Competitive Programmer"
-                  delay={0.2}
-                  stagger={0.015}
-                />
-              </div>
+              <p className="font-sans text-xs md:text-sm text-white/80 tracking-[0.25em] uppercase mt-2 max-w-xl mx-auto leading-relaxed">
+                Engineering Intelligent Systems • Systems Engineer • Competitive Programmer
+              </p>
             </motion.div>
 
-            {/* High-Taste Spotlight Launch Card */}
-            <motion.div
-              initial={{ opacity: 0, scale: 0.94, y: 15 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.94, y: 15 }}
-              transition={{ duration: 0.6, delay: 0.15, ease: [0.16, 1, 0.3, 1] }}
-              className="relative z-20 max-w-lg w-full px-4 my-auto"
+            {/* Launch Card */}
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.9 }}
+              transition={{ duration: 0.6, delay: 0.2 }}
+              className="relative z-20 bg-[#09080d]/95 backdrop-blur-xl border border-[#f5b942]/50 p-8 rounded-2xl max-w-lg text-center shadow-2xl pointer-events-auto my-auto"
             >
-              <SpotlightCard
-                spotlightColor="rgba(245, 185, 66, 0.22)"
-                borderColor="rgba(245, 185, 66, 0.45)"
-                className="p-8 text-center glass-panel-amber"
+              <div className="text-xs font-mono text-[#f5b942] tracking-widest uppercase mb-3 flex items-center justify-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                LAUNCH PROTOCOL READY
+              </div>
+              <p className="font-sans text-xs text-white/80 leading-relaxed mb-6">
+                Click below to trigger the custom rocket launch video sequence and break into orbit.
+              </p>
+
+              <button
+                onClick={handleLaunchClick}
+                className="w-full bg-[#f5b942] text-black font-sans text-xs font-bold py-4 rounded-xl tracking-[0.2em] uppercase hover:bg-white transition-all shadow-[0_0_35px_rgba(245,185,66,0.7)] cursor-pointer hover:scale-105 active:scale-95"
               >
-                <div className="text-xs font-mono text-amber-400 tracking-widest uppercase mb-3 flex items-center justify-center gap-2">
-                  <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
-                  <span className="w-2 h-2 rounded-full bg-emerald-400 absolute"></span>
-                  <DecryptedText text="LAUNCH PROTOCOL READY" speed={25} />
-                </div>
-
-                <p className="font-sans text-xs text-slate-300/85 leading-relaxed mb-6">
-                  Click below to trigger the custom rocket launch video sequence and break into orbit.
-                </p>
-
-                <MagnetButton onClick={handleLaunchClick} className="w-full">
-                  <div className="w-full bg-gradient-to-r from-amber-400 via-amber-300 to-amber-500 text-slate-950 font-heading text-xs font-extrabold py-4 px-8 rounded-xl tracking-[0.2em] uppercase hover:brightness-110 transition-all shadow-[0_0_35px_rgba(245,185,66,0.6)]">
-                    LAUNCH ROCKET 🚀
-                  </div>
-                </MagnetButton>
-              </SpotlightCard>
+                LAUNCH ROCKET 🚀
+              </button>
             </motion.div>
 
             {/* Footer Credentials */}
-            <motion.footer
-              initial={{ opacity: 0, y: 24 }}
+            <motion.footer 
+              initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: 24 }}
-              transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
-              className="relative z-20 w-full p-8 flex justify-between items-end text-[10px] font-mono text-slate-400/80 tracking-widest uppercase"
+              exit={{ opacity: 0, y: 30 }}
+              transition={{ duration: 0.8 }}
+              className="relative z-20 w-full p-8 flex justify-between items-end text-[10px] font-mono text-white/60 tracking-widest uppercase"
             >
-              <div className="flex items-center gap-2">
-                <span className="text-amber-400 font-bold">⚡</span>
-                <span>CODEFORCES SPECIALIST (1458) • IMC PROSPERITY FINALIST</span>
-              </div>
-              <div className="text-right">
-                <span className="text-amber-400 font-bold">PROD</span> • CUSTOM ROCKET LAUNCH 2026
-              </div>
+              <div>CODEFORCES SPECIALIST (1458) • IMC PROSPERITY FINALIST</div>
+              <div>CUSTOM ROCKET LAUNCH 2026</div>
             </motion.footer>
           </>
         )}
       </AnimatePresence>
-    </AuroraBackground>
+
+    </div>
   );
 };
