@@ -1,25 +1,67 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
 
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
+@layer base {
+  :root {
+    --font-sans: 'Plus Jakarta Sans', system-ui, sans-serif;
+    --font-heading: 'Outfit', 'Space Grotesk', sans-serif;
+    --font-display: 'Space Grotesk', 'Outfit', sans-serif;
+    --font-mono: 'JetBrains Mono', monospace;
+
+    /* Curated Dark Mode Palette: Deep Obsidian, Solar Amber, Emerald, Deep Rose */
+    --bg-obsidian: #070a0f;
+    --bg-surface: #0e131d;
+    --bg-glass: rgba(14, 19, 29, 0.78);
+    --border-amber: rgba(245, 185, 66, 0.22);
+    --border-subtle: rgba(255, 255, 255, 0.08);
+
+    --accent-amber: #f5b942;
+    --accent-emerald: #10b981;
+    --accent-rose: #f43f5e;
+    --accent-cyan: #06b6d4;
+
+    --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+    --ease-spring: cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  html, body, #root {
+    width: 100vw;
+    height: 100vh;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    position: relative;
+    background-color: var(--bg-obsidian);
+    color: #f1f5f9;
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
 }
 
-html, body, #root {
-  width: 100vw;
-  height: 100vh;
-  margin: 0;
-  padding: 0;
-  overflow: hidden;
-  position: relative;
-  background-color: #030303;
-  color: white;
-  font-family: 'Inter', sans-serif;
+/* Custom Font Family Utilities */
+.font-sans {
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif !important;
 }
 
+.font-heading {
+  font-family: 'Outfit', 'Space Grotesk', sans-serif !important;
+}
+
+.font-display {
+  font-family: 'Space Grotesk', 'Outfit', sans-serif !important;
+}
+
+.font-mono {
+  font-family: 'JetBrains Mono', monospace !important;
+}
+
+/* Canvas & UI Overlay Containers */
 .canvas-container {
   position: absolute;
   top: 0;
@@ -39,25 +81,46 @@ html, body, #root {
   pointer-events: none;
 }
 
-.font-display {
-  font-family: 'JetBrains Mono', monospace;
+/* Premium Glassmorphic Cards & Panels */
+.glass-panel {
+  background: color-mix(in srgb, var(--bg-surface) 85%, transparent);
+  border: 1px solid var(--border-subtle);
+  box-shadow: 0 20px 50px -20px rgba(0, 0, 0, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
 }
 
-.font-body {
-  font-family: 'Inter', sans-serif;
+.glass-panel-amber {
+  background: color-mix(in srgb, var(--bg-surface) 88%, transparent);
+  border: 1px solid var(--border-amber);
+  box-shadow: 0 24px 60px -24px rgba(245, 185, 66, 0.15), inset 0 1px 0 rgba(245, 185, 66, 0.15);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
 }
 
-/* Custom Scrollbar for UI panels */
+/* High-Taste Scrollbar */
 .custom-scrollbar::-webkit-scrollbar {
-  width: 4px;
+  width: 5px;
+  height: 5px;
 }
 .custom-scrollbar::-webkit-scrollbar-track {
-  background: transparent;
+  background: rgba(7, 10, 15, 0.4);
 }
 .custom-scrollbar::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.2);
-  border-radius: 4px;
+  background: rgba(245, 185, 66, 0.25);
+  border-radius: 999px;
+  transition: background 200ms ease;
 }
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.4);
+  background: rgba(245, 185, 66, 0.5);
+}
+
+/* Glow Keyframes */
+@keyframes ambientGlow {
+  0%, 100% { opacity: 0.4; transform: scale(1); }
+  50% { opacity: 0.7; transform: scale(1.05); }
+}
+
+.animate-ambient-glow {
+  animation: ambientGlow 8s ease-in-out infinite;
 }
