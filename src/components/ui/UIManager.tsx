@@ -20,6 +20,23 @@ export const UIManager: React.FC<UIManagerProps> = ({
 
   React.useEffect(() => {
     setDismissedModal(false);
+
+    if (activeHub) {
+      const hubMap: Record<string, number> = {
+        'proj_devdash': 0,
+        'proj_openonyx': 1,
+        'proj_keystrokelab': 2,
+        'proj_hopper': 3,
+        'proj_deepfake': 4,
+        'proj_returnguard': 0,
+        'proj_cipd': 1,
+        'proj_shell': 2,
+        'proj_studyplanner': 3,
+      };
+      if (activeHub in hubMap) {
+        setSelectedProjectIndex(hubMap[activeHub]);
+      }
+    }
   }, [activeHub]);
 
   return (
@@ -135,11 +152,12 @@ export const UIManager: React.FC<UIManagerProps> = ({
 
               {(() => {
                 const proj = projectsData[selectedProjectIndex] || projectsData[0];
+                if (!proj) return null;
                 return (
                   <div>
                     <div className="flex justify-between items-center mb-2">
                       <span className="text-[11px] font-mono text-amber-400 tracking-wider uppercase">
-                        {proj.tags.join(' • ')}
+                        {proj.tags ? proj.tags.join(' • ') : 'Project'}
                       </span>
                       <span className="text-[10px] font-mono text-gray-500">
                         {selectedProjectIndex + 1} / {projectsData.length}
@@ -147,30 +165,32 @@ export const UIManager: React.FC<UIManagerProps> = ({
                     </div>
 
                     <h2 className="font-sans text-2xl font-bold text-white mb-3">
-                      {proj.title}
+                      {proj.title || 'Project Details'}
                     </h2>
                     
                     <p className="font-sans text-sm text-gray-300 leading-relaxed mb-6 max-h-[35vh] overflow-y-auto pr-2 custom-scrollbar">
-                      {proj.longDescription || proj.description}
+                      {proj.longDescription || proj.description || ''}
                     </p>
 
                     <div className="pt-4 border-t border-white/10 flex justify-between items-center flex-wrap gap-4">
                       <div className="flex flex-wrap gap-2">
                         {proj.metrics && Object.entries(proj.metrics).map(([key, val]) => (
                           <span key={key} className="bg-white/5 border border-white/10 text-gray-300 text-xs font-mono px-3 py-1 rounded-lg">
-                            {key}: <strong className="text-amber-400 font-normal">{val}</strong>
+                            {key}: <strong className="text-amber-400 font-normal">{String(val)}</strong>
                           </span>
                         ))}
                       </div>
 
-                      <a 
-                        href={proj.githubUrl} 
-                        target="_blank" 
-                        rel="noopener noreferrer"
-                        className="bg-amber-400 hover:bg-amber-300 text-black font-sans text-xs font-semibold px-4 py-2 rounded-xl transition-all shadow-md flex items-center gap-1.5"
-                      >
-                        GITHUB REPO →
-                      </a>
+                      {proj.githubUrl && (
+                        <a 
+                          href={proj.githubUrl} 
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          className="bg-amber-400 hover:bg-amber-300 text-black font-sans text-xs font-semibold px-4 py-2 rounded-xl transition-all shadow-md flex items-center gap-1.5"
+                        >
+                          GITHUB REPO →
+                        </a>
+                      )}
                     </div>
                   </div>
                 );
@@ -260,7 +280,7 @@ export const UIManager: React.FC<UIManagerProps> = ({
                     JAN – APR 2026
                   </span>
                   <h2 className="font-sans text-2xl font-bold text-white mt-3 mb-1">Grove Growth</h2>
-                  <div className="text-xs font-mono text-gray-400 mb-4">Software Developer Intern</div>
+                  <div className="text-xs font-mono text-[#10b981] font-bold mb-4">Software Developer Intern</div>
                   <p className="font-sans text-sm text-gray-300 leading-relaxed">
                     Shipped a production gamified campus-ambassador platform for 100+ users — 20+ REST APIs in TypeScript & Next.js on a 17-table Supabase schema. Gated every release behind 433 automated tests.
                   </p>
