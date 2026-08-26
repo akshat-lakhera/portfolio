@@ -32,62 +32,78 @@ const setCharacter = (
               if (child.isMesh) {
                 const mesh = child as THREE.Mesh;
                 const name = mesh.name;
+                const nameLower = name.toLowerCase();
 
-                // ── Match Akshat's real appearance ──
+                // ── Match Akshat's real appearance (Case-Insensitive) ──
                 if (mesh.material) {
                   const cloneMat = () =>
                     (mesh.material as THREE.Material).clone() as THREE.MeshStandardMaterial;
 
-                  // Hide cap — Akshat doesn't wear one, show natural hair
-                  if (name === "CAP.001" || name === "CAP.002") {
+                  // 1. Hide Cap (Akshat does not wear one)
+                  if (nameLower.includes("cap")) {
                     mesh.visible = false;
+                    const mat = cloneMat();
+                    mat.transparent = true;
+                    mat.opacity = 0;
+                    mesh.material = mat;
                   }
-                  // Skin — natural warm tan matching Akshat's photo
+                  // 2. Skin (Face, Ear, Neck, Hand)
                   else if (
-                    name === "Face.002" || name === "Ear.001" ||
-                    name === "Neck" || name === "Hand"
+                    nameLower.includes("face") ||
+                    nameLower.includes("ear") ||
+                    nameLower.includes("neck") ||
+                    nameLower.includes("hand")
                   ) {
                     const mat = cloneMat();
-                    mat.color = new THREE.Color("#c58b68");
+                    mat.color = new THREE.Color("#c58b68"); // Natural warm tan
                     mat.roughness = 0.6;
                     mesh.material = mat;
                   }
-                  // Hair — jet black, thick texture
+                  // 3. Hair & Eyebrows
                   else if (
-                    name.toLowerCase().includes("hair") ||
-                    name.toLowerCase().includes("brow")
+                    nameLower.includes("hair") ||
+                    nameLower.includes("eyebrow") ||
+                    nameLower.includes("brow")
                   ) {
                     const mat = cloneMat();
-                    mat.color = new THREE.Color("#0f0d0b");
+                    mat.color = new THREE.Color("#0f0d0b"); // Jet black
                     mat.roughness = 0.85;
                     mesh.material = mat;
                   }
-                  // Eyes — dark brown iris
-                  else if (name.toLowerCase().includes("eye")) {
+                  // 4. Eyes
+                  else if (nameLower.includes("eye")) {
                     const mat = cloneMat();
                     mat.color = new THREE.Color("#2c1a0e");
                     mesh.material = mat;
                   }
-                  // Lips — natural warm tone, slightly darker than skin
-                  else if (name.toLowerCase().includes("lip") || name.toLowerCase().includes("mouth")) {
+                  // 5. Lips, Mouth & Teeth
+                  else if (
+                    nameLower.includes("lip") ||
+                    nameLower.includes("mouth") ||
+                    nameLower.includes("teeth")
+                  ) {
                     const mat = cloneMat();
                     mat.color = new THREE.Color("#7a5040");
                     mesh.material = mat;
                   }
-                  // Charcoal sweater
-                  else if (name === "BODY.SHIRT") {
+                  // 6. Shirt / Body
+                  else if (nameLower.includes("shirt") || nameLower.includes("body")) {
                     const mat = cloneMat();
-                    mat.color = new THREE.Color("#2a2d32");
+                    mat.color = new THREE.Color("#2a2d32"); // Charcoal sweater
                     mesh.material = mat;
                   }
-                  // Dark pants
-                  else if (name === "Pant") {
+                  // 7. Pants
+                  else if (nameLower.includes("pant")) {
                     const mat = cloneMat();
                     mat.color = new THREE.Color("#111111");
                     mesh.material = mat;
                   }
-                  // Shoes — dark to match
-                  else if (name.toLowerCase().includes("shoe") || name.toLowerCase().includes("foot")) {
+                  // 8. Shoes & Feet
+                  else if (
+                    nameLower.includes("shoe") ||
+                    nameLower.includes("foot") ||
+                    nameLower.includes("sole")
+                  ) {
                     const mat = cloneMat();
                     mat.color = new THREE.Color("#1a1a1a");
                     mesh.material = mat;
