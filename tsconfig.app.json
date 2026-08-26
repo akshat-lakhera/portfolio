@@ -15,6 +15,9 @@
     "moduleDetection": "force",
     "noEmit": true,
     "jsx": "react-jsx",
+    "paths": {
+      "motion/react": ["./node_modules/framer-motion"]
+    },
 
     /* Linting */
     "noUnusedLocals": true,
